@@ -95,13 +95,13 @@ class Models:
         models.append(GaussianNB())
         models.append(KNeighborsClassifier())
         models.append(AdaBoostClassifier())
-        models.append(BaggingClassifier(n_estimators=10))
-        models.append(RandomForestClassifier(n_estimators=10))
-        models.append(ExtraTreesClassifier(n_estimators=10))
+        models.append(BaggingClassifier(n_estimators=300))
+        models.append(RandomForestClassifier(n_estimators=300))
+        models.append(ExtraTreesClassifier(n_estimators=300))
         models.append(XGBClassifier())
         return models
 
-    def get_super_learner(self):
+    def get_super_learner(self, meta):
         ensemble = SequentialEnsemble(scorer=accuracy_score, shuffle=True,
                                       model_selection=True, backend='threading', sample_size=len(self.X_train))
         # ensemble = SuperLearner(scorer=accuracy_score,
@@ -110,11 +110,11 @@ class Models:
         ensemble.add('blend', models)
         ensemble.add('stack', models)
         ensemble.add('subsemble', models)
-        ensemble.add_meta(RandomForestClassifier(n_estimators=250))
+        ensemble.add_meta(meta)
         return ensemble
 
-    def mlen_combined_model(self):
-        ensemble = self.get_super_learner()
+    def mlen_combined_model(self, meta):
+        ensemble = self.get_super_learner(meta)
         ensemble.fit(self.X_train.values, self.y_train.values)
         print(ensemble.data)
 
