@@ -1,0 +1,5 @@
+{
+    "python.pythonPath": "/home/anvy/Others/Projects/ensemble/.venv/bin/python3",
+    "python.languageServer": "Pylance",
+    "editor.wordWrap": "on"
+}
