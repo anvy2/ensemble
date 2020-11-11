@@ -5,7 +5,7 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression, SGDClassifier, RidgeClassifier
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
-from mlens.ensemble import SuperLearner
+from mlens.ensemble import SuperLearner, SequentialEnsemble
 from sklearn.metrics import accuracy_score, r2_score
 from sklearn.metrics import confusion_matrix, classification_report
 
@@ -102,11 +102,15 @@ class Models:
         return models
 
     def get_super_learner(self):
-        ensemble = SuperLearner(scorer=accuracy_score,
-                                folds=10, shuffle=True, sample_size=len(self.X_train))
+        ensemble = SequentialEnsemble(scorer=accuracy_score, shuffle=True,
+                                      model_selection=True, backend='threading', sample_size=len(self.X_train))
+        # ensemble = SuperLearner(scorer=accuracy_score,
+        #                         folds=10, shuffle=True, model_selection=True, sample_size=len(self.X_train))
         models = self.get_super_learner_models()
-        ensemble.add(models)
-        ensemble.add_meta(LogisticRegression(solver='lbfgs'))
+        ensemble.add('blend', models)
+        ensemble.add('stack', models)
+        ensemble.add('subsemble', models)
+        ensemble.add_meta(RandomForestClassifier(n_estimators=250))
         return ensemble
 
     def mlen_combined_model(self):
